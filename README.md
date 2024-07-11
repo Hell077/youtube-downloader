@@ -61,9 +61,9 @@ OR
 
 Run the exe file from the repository
 
-    ```sh
-       youtubeDownloaderGo.exe
-    ```
+  ```sh
+      youtubeDownloaderGo.exe
+   ```
 
 3. Follow the on-screen instructions to input the YouTube video URL and the download path.
 
