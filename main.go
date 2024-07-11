@@ -17,20 +17,20 @@ import (
 
 func main() {
 	var url, path string
-	fmt.Print("Введите URL видео на YouTube: ")
+	fmt.Print("Enter YouTube video URL: ")
 	fmt.Scanln(&url)
-	fmt.Print("Введите путь для сохранения: ")
+	fmt.Print("Enter save path: ")
 	fmt.Scanln(&path)
 
 	client := youtube.Client{}
 
 	video, err := client.GetVideo(url)
 	if err != nil {
-		log.Fatalf("Ошибка при получении информации о видео: %v", err)
+		log.Fatalf("Error getting video info: %v", err)
 	}
 	formats := video.Formats
 	if len(formats) == 0 {
-		log.Fatalf("Не найдены форматы для видео: %s", url)
+		log.Fatalf("No formats found for video: %s", url)
 	}
 
 	audioFormats := make([]youtube.Format, 0)
@@ -40,10 +40,10 @@ func main() {
 		}
 	}
 	if len(audioFormats) == 0 {
-		log.Fatalf("Не найдены форматы с аудио для видео: %s", url)
+		log.Fatalf("No audio formats found for video: %s", url)
 	}
 
-	fmt.Println("Доступные качества с аудио:")
+	fmt.Println("Available audio qualities:")
 	var qualityMap = make(map[string]youtube.Format)
 	for _, format := range audioFormats {
 		if format.QualityLabel != "" {
@@ -54,12 +54,12 @@ func main() {
 
 	err = keyboard.Open()
 	if err != nil {
-		log.Fatalf("Ошибка открытия терминала для ввода: %v", err)
+		log.Fatalf("Error opening terminal for input: %v", err)
 	}
 	defer keyboard.Close()
 
 	var selectedQuality string
-	fmt.Println("\nИспользуйте стрелки вверх/вниз для выбора качества, затем Enter для подтверждения:")
+	fmt.Println("\nUse up/down arrows to select quality, then Enter to confirm:")
 
 	var selectedIndex int
 	selectedIndex = 0
@@ -79,7 +79,7 @@ func main() {
 
 		_, key, err := keyboard.GetKey()
 		if err != nil {
-			log.Fatalf("Ошибка при получении клавиши: %v", err)
+			log.Fatalf("Error getting key: %v", err)
 		}
 
 		switch key {
@@ -99,14 +99,14 @@ func main() {
 FormatSelected:
 	format, exists := qualityMap[selectedQuality]
 	if !exists {
-		log.Fatalf("Выбрано недопустимое качество")
+		log.Fatalf("Invalid quality selected")
 	}
 
-	fmt.Printf("Выбрано качество: %s\n", format.QualityLabel)
+	fmt.Printf("Selected quality: %s\n", format.QualityLabel)
 
 	stream, size, err := client.GetStream(video, &format)
 	if err != nil {
-		log.Fatalf("Ошибка при получении потока: %v", err)
+		log.Fatalf("Error getting stream: %v", err)
 	}
 	defer stream.Close()
 
@@ -117,13 +117,13 @@ FormatSelected:
 
 	file, err := os.Create(path)
 	if err != nil {
-		log.Fatalf("Ошибка при создании файла: %v", err)
+		log.Fatalf("Error creating file: %v", err)
 	}
 	defer file.Close()
 
 	bar := progressbar.NewOptions64(
 		size,
-		progressbar.OptionSetDescription("Загрузка"),
+		progressbar.OptionSetDescription("Downloading"),
 		progressbar.OptionSetWriter(os.Stdout),
 		progressbar.OptionEnableColorCodes(true),
 		progressbar.OptionShowBytes(true),
@@ -146,15 +146,15 @@ FormatSelected:
 		defer wg.Done()
 		_, err := io.Copy(io.MultiWriter(file, bar), stream)
 		if err != nil {
-			log.Fatalf("Ошибка при записи в файл: %v", err)
+			log.Fatalf("Error writing to file: %v", err)
 		}
 	}()
 
 	wg.Wait()
 
-	fmt.Println("\nВидео успешно загружено")
+	fmt.Println("\nVideo successfully downloaded")
 
-	fmt.Println("Нажмите Enter для выхода...")
+	fmt.Println("Press Enter to exit...")
 	fmt.Scanln()
 }
 
