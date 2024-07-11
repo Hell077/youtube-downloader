@@ -18,7 +18,7 @@ This is a simple console application written in Go that allows you to download Y
 1. Clone the repository:
 
     ```sh
-    git clone[ https://github.com/your-username/your-repository-name.git](https://github.com/Hell077/youtube-downloader-go
+    git clone https://github.com/your-username/your-repository-name.git](https://github.com/Hell077/youtube-downloader-go
     ```
 
 2. Navigate to the project directory:
