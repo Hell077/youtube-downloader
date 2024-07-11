@@ -2,6 +2,16 @@
 
 This is a simple console application written in Go that allows you to download YouTube videos by providing the video URL and the desired download path.
 
+## WARNING
+- Use only English folder path name
+
+like this
+
+  ```sh
+        C:\Video
+  ```
+
+
 ## Features
 
 - Select video quality with audio
@@ -46,6 +56,14 @@ This is a simple console application written in Go that allows you to download Y
     ```sh
     ./youtube-downloader
     ```
+
+OR 
+
+Run the exe file from the repository
+
+  ```sh
+      youtubeDownloaderGo.exe
+   ```
 
 3. Follow the on-screen instructions to input the YouTube video URL and the download path.
 
