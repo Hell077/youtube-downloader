@@ -6,7 +6,11 @@ This is a simple console application written in Go that allows you to download Y
 - Use only English folder path name
 
 like this
-C:\Video
+
+  ```sh
+        C:\Video
+  ```
+
 
 ## Features
 
@@ -51,6 +55,14 @@ C:\Video
 
     ```sh
     ./youtube-downloader
+    ```
+
+OR 
+
+Run the exe file from the repository
+
+    ```sh
+       youtubeDownloaderGo.exe
     ```
 
 3. Follow the on-screen instructions to input the YouTube video URL and the download path.
