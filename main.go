@@ -33,48 +33,50 @@ func main() {
 		log.Fatalf("No formats found for video: %s", url)
 	}
 
-	audioFormats := make([]youtube.Format, 0)
-	for _, format := range formats {
+	fmt.Println("Available formats:")
+
+	var audioFormatIndices []int
+	formatMap := make(map[int]youtube.Format)
+
+	for i, format := range formats {
+		formatMap[i] = format
+		formatLabel := format.QualityLabel
 		if format.AudioQuality != "" {
-			audioFormats = append(audioFormats, format)
+			formatLabel += " (with audio)"
+			audioFormatIndices = append(audioFormatIndices, i)
 		}
-	}
-	if len(audioFormats) == 0 {
-		log.Fatalf("No audio formats found for video: %s", url)
+		fmt.Printf("%d. %s\n", i+1, formatLabel)
 	}
 
-	fmt.Println("Available audio qualities:")
-	var qualityMap = make(map[string]youtube.Format)
-	for _, format := range audioFormats {
-		if format.QualityLabel != "" {
-			qualityMap[format.QualityLabel] = format
-			fmt.Printf("- %s\n", format.QualityLabel)
-		}
+	if len(formatMap) == 0 {
+		log.Fatalf("No formats found for video: %s", url)
 	}
-
-	err = keyboard.Open()
-	if err != nil {
-		log.Fatalf("Error opening terminal for input: %v", err)
-	}
-	defer keyboard.Close()
-
-	var selectedQuality string
-	fmt.Println("\nUse up/down arrows to select quality, then Enter to confirm:")
 
 	var selectedIndex int
 	selectedIndex = 0
+
+	err = keyboard.Open()
+	if err != nil {
+		log.Fatalf("Error opening keyboard: %v", err)
+	}
+	defer keyboard.Close()
+
+	fmt.Println("\nUse arrow keys to select quality, then Enter to confirm:")
 
 	for {
 		screen.Clear()
 		screen.MoveTopLeft()
 
-		for index, format := range audioFormats {
+		for index, format := range formats {
 			indicator := " "
 			if index == selectedIndex {
 				indicator = ">"
-				selectedQuality = format.QualityLabel
 			}
-			fmt.Printf("%s %s\n", indicator, format.QualityLabel)
+			formatLabel := format.QualityLabel
+			if format.AudioQuality != "" {
+				formatLabel += " (with audio)"
+			}
+			fmt.Printf("%s %s\n", indicator, formatLabel)
 		}
 
 		_, key, err := keyboard.GetKey()
@@ -84,7 +86,7 @@ func main() {
 
 		switch key {
 		case keyboard.KeyArrowDown:
-			if selectedIndex < len(audioFormats)-1 {
+			if selectedIndex < len(formats)-1 {
 				selectedIndex++
 			}
 		case keyboard.KeyArrowUp:
@@ -97,19 +99,16 @@ func main() {
 	}
 
 FormatSelected:
-	format, exists := qualityMap[selectedQuality]
-	if !exists {
-		log.Fatalf("Invalid quality selected")
-	}
+	selectedFormat := formatMap[selectedIndex]
+	fmt.Printf("Selected quality: %s\n", selectedFormat.QualityLabel)
 
-	fmt.Printf("Selected quality: %s\n", format.QualityLabel)
-
-	stream, size, err := client.GetStream(video, &format)
+	stream, size, err := client.GetStream(video, &selectedFormat)
 	if err != nil {
 		log.Fatalf("Error getting stream: %v", err)
 	}
 	defer stream.Close()
 
+	// Create file for download
 	if info, err := os.Stat(path); err == nil && info.IsDir() {
 		fileName := video.Title + ".mp4"
 		path = filepath.Join(path, sanitizeFileName(fileName))
@@ -121,6 +120,7 @@ FormatSelected:
 	}
 	defer file.Close()
 
+	// Progress bar setup
 	bar := progressbar.NewOptions64(
 		size,
 		progressbar.OptionSetDescription("Downloading"),
@@ -134,14 +134,13 @@ FormatSelected:
 			BarStart:      "[",
 			BarEnd:        "]",
 		}),
-		progressbar.OptionSetRenderBlankState(true),
-		progressbar.OptionSetPredictTime(true),
 		progressbar.OptionSetWidth(60),
 	)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
+	// Download in a goroutine
 	go func() {
 		defer wg.Done()
 		_, err := io.Copy(io.MultiWriter(file, bar), stream)
