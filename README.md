@@ -10,7 +10,7 @@ This is a simple console application written in Go that allows you to download Y
 
 ## Requirements
 
-- Go 1.16 or later
+- Go 1.20 or later
 - A terminal supporting keyboard input
 
 ## Installation
@@ -18,7 +18,7 @@ This is a simple console application written in Go that allows you to download Y
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/your-username/your-repository-name.git](https://github.com/Hell077/youtube-downloader-go
+    git clone https://github.com/Hell077/youtube-downloader-go
     ```
 
 2. Navigate to the project directory:
@@ -56,16 +56,16 @@ This is a simple console application written in Go that allows you to download Y
 ## Example
 
 ```plaintext
-Введите URL видео на YouTube: https://www.youtube.com/watch?v=dQw4w9WgXcQ
-Введите путь для сохранения: /path/to/save
+Enter YouTube video URL: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+Enter save path: /path/to/save
 
-Доступные качества с аудио:
+Available audio qualities:
 - 360p
 - 720p
 
-Используйте стрелки вверх/вниз для выбора качества, затем Enter для подтверждения:
+Use up/down arrows to select quality, then Enter to confirm:
 > 720p
   360p
 
-Загрузка [========================================] 100% 3.7 MB/s
-Видео успешно загружено
+Downloading [========================================] 100% 3.7 MB/s
+Video successfully downloaded
