@@ -5,8 +5,8 @@ This is a simple console application written in Go that allows you to download Y
 ## WARNING
 - Use only English folder path name
 
--like this
--C:\Video
+like this
+C:\Video
 
 ## Features
 
